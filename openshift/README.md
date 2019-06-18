@@ -111,7 +111,7 @@ The following allow for overriding the default secret and configmap (that are au
 The following are for setting environment variables.
 * HOST\_URL - The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv:8080
 * PORT - port for node to listen on.  Best to leave as the default 8080 - see note above.
-* SERVICE\_VERSION - useful if you are forking and versioning your own code.  Default 1
+* SERVICE\_VERSION - useful if you are forking and versioning your own code.  Default 1.0.0
 * SERVICE\_HOMEPAGE - useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git
 * SERVER\_LOGLEVEL - set the npm log level (verbose, debug, info, warn, error). Default is info
 * SERVER\_MORGANFORMAT - set the logging format for Morgan.  Default dev

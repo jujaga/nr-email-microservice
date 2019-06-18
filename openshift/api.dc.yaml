@@ -161,7 +161,7 @@ parameters:
 - name: SERVICE_VERSION
   description: useful if you are forking and versioning your own code
   required: true
-  value: "1"
+  value: "1.0.0"
 - name: SERVICE_HOMEPAGE
   description: useful if you are forking and versioning your own code
   required: true
