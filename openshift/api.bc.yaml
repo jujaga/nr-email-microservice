@@ -2,17 +2,17 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: "${APP_NAME}-${JOB_NAME}-api-bc"
+  template: "${APP_NAME}${INSTANCE_ID}-api-bc"
 metadata:
-  name: "${APP_NAME}-${JOB_NAME}-api-bc"
+  name: "${APP_NAME}${INSTANCE_ID}-api-bc"
 objects:
 
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     labels:
-      app: "${APP_NAME}-${JOB_NAME}"
-    name: "${APP_NAME}-${JOB_NAME}-api"
+      app: "${APP_NAME}${INSTANCE_ID}"
+    name: "${APP_NAME}${INSTANCE_ID}-api"
   spec:
     lookupPolicy:
       local: false
@@ -21,8 +21,8 @@ objects:
   kind: BuildConfig
   metadata:
     labels:
-      app: "${APP_NAME}-${JOB_NAME}"
-    name: "${APP_NAME}-${JOB_NAME}-api"
+      app: "${APP_NAME}${INSTANCE_ID}"
+    name: "${APP_NAME}${INSTANCE_ID}-api"
   spec:
     completionDeadlineSeconds: 600
     failedBuildsHistoryLimit: 5
@@ -30,7 +30,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: "${APP_NAME}-${JOB_NAME}-api:latest"
+        name: "${APP_NAME}${INSTANCE_ID}-api:latest"
     postCommit: {}
     resources:
       requests:
@@ -54,6 +54,7 @@ objects:
           namespace: openshift
         incremental: true
     successfulBuildsHistoryLimit: 5
+
 parameters:
 - name: REPO_NAME
   description: Application repository name
@@ -70,11 +71,9 @@ parameters:
 - name: APP_NAME
   description: Application name
   required: true
-  value: email-ms
-- name: JOB_NAME
-  description: Job identifier (i.e. 'pr-5' OR 'master')
-  required: true
-  value: master
+  value: email-microsrv
+- name: INSTANCE_ID
+  description: Differentiate instances of microservice (pull request instances vs master), start with a dash to separate from app_name (i.e. '-pr-5' OR '-master')
 - name: CPU_REQUEST
   description: Requested CPU per pod (in millicores ex. 500m)
   required: true
