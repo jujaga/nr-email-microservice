@@ -6,7 +6,7 @@ const utils = require('../components/utils');
 
 const Problem = require('api-problem');
 
-const tokenUrl = config.get('services.cmsg.urls.token');
+const tokenUrl = config.get('cmsg.urls.token');
 
 const webadeSvc = {
   getToken: async (username, password, scope) => {
@@ -21,14 +21,14 @@ const webadeSvc = {
         scope: scope
       }
     }).catch(e => {
-      throw new Problem(e.response.status, 'OAuth token error', {detail: e.message, tokenUrl: config.get('services.cmsg.urls.token')});
+      throw new Problem(e.response.status, 'OAuth token error', {detail: e.message, tokenUrl: config.get('cmsg.urls.token')});
     });
 
     log.verbose(utils.prettyStringify(response.data));
 
     if (!utils.responseOk(response.status)) {
       log.error('', 'Error getting OAuth token from %s: %d - %s', tokenUrl, response.status, response.statusText);
-      throw new Problem(response.status, 'OAuth token response error', {detail: response.statusText, tokenUrl: config.get('services.cmsg.urls.token')});
+      throw new Problem(response.status, 'OAuth token response error', {detail: response.statusText, tokenUrl: config.get('cmsg.urls.token')});
     }
 
     return response.data;

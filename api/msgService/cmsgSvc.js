@@ -4,7 +4,7 @@ const log = require('npmlog');
 
 const utils = require('../components/utils');
 
-const ROOT_URL = config.get('services.cmsg.urls.root');
+const ROOT_URL = config.get('cmsg.urls.root');
 const MESSAGES_URL = `${ROOT_URL}messages`;
 
 const Problem = require('api-problem');
@@ -121,8 +121,8 @@ const cmsgSvc = {
       hasTopLevel: false,
       hasCreateMessage: false
     };
-    status.hasTopLevel = (data.scope && data.scope.split(' ').indexOf(config.get('services.cmsg.scopes.topLevel')) >= 0);
-    status.hasCreateMessage = (data.scope && data.scope.split(' ').indexOf(config.get('services.cmsg.scopes.createMessage')) >= 0);
+    status.hasTopLevel = (data.scope && data.scope.split(' ').indexOf(config.get('cmsg.scopes.topLevel')) >= 0);
+    status.hasCreateMessage = (data.scope && data.scope.split(' ').indexOf(config.get('cmsg.scopes.createMessage')) >= 0);
 
     return {status};
   },

@@ -1,8 +1,8 @@
 const config = require('config');
 
-const clientScopes = config.get('services.cmsg.scopes.all');
-const clientId = config.get('services.cmsg.client.id');
-const clientSecret = config.get('services.cmsg.client.secret');
+const clientScopes = config.get('cmsg.scopes.all');
+const clientId = config.get('cmsg.client.id');
+const clientSecret = config.get('cmsg.client.secret');
 
 const { webadeSvc } = require('../oauthService/webadeSvc');
 const { cmsgSvc } = require('../msgService/cmsgSvc');

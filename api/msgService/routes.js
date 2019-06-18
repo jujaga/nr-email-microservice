@@ -7,7 +7,7 @@ const {login} = require('../middleware/login');
 const {authenticate} = require('../middleware/authenticate');
 const {authorize} = require('../middleware/authorize');
 
-const CREATE_MSG = config.get('services.cmsg.scopes.createMessage');
+const CREATE_MSG = config.get('cmsg.scopes.createMessage');
 
 const routes = require('express').Router();
 

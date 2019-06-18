@@ -18,22 +18,21 @@
     },
     "hostUrl": "http://localhost:8080"
   },
-  "services": {
-    "cmsg": {
-      "urls": {
-        "token": "set in custom environment variables...",
-        "root": "set in custom environment variables..."
-      },
-      "client": {
-        "id": "set in custom environment variables...",
-        "secret": "set in custom environment variables..."
-      },
-      "scopes": {
-        "all": "CMSG.*",
-        "topLevel": "CMSG.GETTOPLEVEL",
-        "createMessage": "CMSG.CREATEMESSAGE"
-      },
-      "sender": "NR.CommonServiceShowcase@gov.bc.ca"
-    }
+  "cmsg": {
+    "urls": {
+      "token": "set in custom environment variables...",
+      "root": "set in custom environment variables..."
+    },
+    "client": {
+      "id": "set in custom environment variables...",
+      "secret": "set in custom environment variables..."
+    },
+    "scopes": {
+      "all": "CMSG.*",
+      "topLevel": "CMSG.GETTOPLEVEL",
+      "createMessage": "CMSG.CREATEMESSAGE"
+    },
+    "sender": "NR.CommonServiceShowcase@gov.bc.ca"
   }
 }
+
