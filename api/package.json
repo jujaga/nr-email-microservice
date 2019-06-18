@@ -1,0 +1,86 @@
+{
+  "name": "nr-email-microservice",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bcgov/nr-email-microservice.git"
+  },
+  "author": "NR Common Service Showcase <NR.CommonServiceShowcase@gov.bc.ca>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/bcgov/nr-email-microservice/issues"
+  },
+  "homepage": "https://github.com/bcgov/nr-email-microservice#readme",
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "CI=true jest --env=jsdom",
+    "lint": "node_modules/.bin/eslint . --no-fix --ignore-pattern 'node_modules' **.js **/www",
+    "lint:fix": "node_modules/.bin/eslint . --fix --ignore-pattern 'node_modules' **.js **/www",
+    "clean": "rm -rf node_modules && rm -rf uploads",
+    "clean:build": "npm run clean && npm install"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "config": "^3.0.1",
+    "eslint-plugin-jest": "^22.5.1",
+    "express": "^4.16.4",
+    "morgan": "^1.9.1",
+    "npmlog": "^4.1.2",
+    "multer": "^1.4.1",
+    "api-problem": "5.1.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-recommended": "^4.0.0",
+    "eslint-plugin-flowtype": "^3.8.1",
+    "jest": "24.7.1"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "commonjs": true,
+      "es6": true,
+      "jest": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "globals": {
+      "Atomics": "readonly",
+      "SharedArrayBuffer": "readonly",
+      "_": false
+    },
+    "parserOptions": {
+      "ecmaVersion": 2018
+    },
+    "rules": {
+      "eol-last": [
+        "error",
+        "always"
+      ],
+      "indent": [
+        "error",
+        2
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "single"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ]
+    }
+  },
+  "jest": {
+    "testMatch": [
+      "**/test/*test.js?(x)"
+    ]
+  }
+}

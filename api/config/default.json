@@ -1,0 +1,39 @@
+{
+  "service" : {
+    "name": "sendEmail",
+    "description" : "BC Gov. Send Email microservice",
+    "version": "1",
+    "homepage": "http://localhost:3001/api/v1"
+  },
+  "server": {
+    "logLevel": "debug",
+    "morganFormat": "dev",
+    "port": "3001",
+    "uploads" : {
+      "path": "./uploads",
+      "fieldName": "files",
+      "fileSize": "5242880",
+      "fileCount": "3",
+      "fileType": "pdf"
+    },
+    "hostUrl": "http://localhost:3001"
+  },
+  "services": {
+    "cmsg": {
+      "urls": {
+        "token": "set in custom environment variables...",
+        "root": "set in custom environment variables..."
+      },
+      "client": {
+        "id": "set in custom environment variables...",
+        "secret": "set in custom environment variables..."
+      },
+      "scopes": {
+        "all": "CMSG.*",
+        "topLevel": "CMSG.GETTOPLEVEL",
+        "createMessage": "CMSG.CREATEMESSAGE"
+      },
+      "sender": "NR.CommonServiceShowcase@gov.bc.ca"
+    }
+  }
+}

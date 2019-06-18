@@ -1,0 +1,37 @@
+{
+  "service" : {
+    "version": "SERVICE_VERSION",
+    "homepage": "SERVICE_HOMEPAGE"
+  },
+  "server": {
+    "logLevel": "SERVER_LOGLEVEL",
+    "morganFormat": "SERVER_MORGANFORMAT",
+    "port": "PORT",
+    "uploads" : {
+      "path": "UPLOADS_PATH",
+      "fieldName": "UPLOADS_FIELD_NAME",
+      "fileSize": "UPLOADS_FILE_SIZE",
+      "fileCount": "UPLOADS_FILE_COUNT",
+      "fileType": "UPLOADS_FILE_TYPE"
+    },
+    "hostUrl": "HOST_URL"
+  },
+  "services": {
+    "cmsg": {
+      "urls": {
+        "token": "OAUTH_TOKEN_URL",
+        "root": "CMSG_TOP_LEVEL_URL"
+      },
+      "client": {
+        "id": "CMSG_CLIENT_ID",
+        "secret": "CMSG_CLIENT_SECRET"
+      },
+      "scopes": {
+        "all": "CMSG_SCOPES_ALL",
+        "topLevel": "CMSG_SCOPES_TOP_LEVEL",
+        "createMessage": "CMSG_SCOPES_CREATE_MESSAGE"
+      },
+      "sender": "CMSG_SENDER"
+    }
+  }
+}
