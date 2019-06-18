@@ -25,11 +25,6 @@
       "id": "CMSG_CLIENT_ID",
       "secret": "CMSG_CLIENT_SECRET"
     },
-    "scopes": {
-      "all": "CMSG_SCOPES_ALL",
-      "topLevel": "CMSG_SCOPES_TOP_LEVEL",
-      "createMessage": "CMSG_SCOPES_CREATE_MESSAGE"
-    },
     "sender": "CMSG_SENDER"
   }
 }

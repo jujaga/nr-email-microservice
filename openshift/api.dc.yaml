@@ -88,21 +88,43 @@ objects:
               cpu: "${CPU_LIMIT}"
               memory: "${MEMORY_LIMIT}"
           env:
+          - name: HOST_URL
+            value: ${HOST_URL}
           - name: PORT
-            value: "8080"
+            value: ${PORT}
+          - name: SERVICE_VERSION
+            value: ${SERVICE_VERSION}
+          - name: SERVICE_HOMEPAGE
+            value: ${SERVICE_HOMEPAGE}
+          - name: SERVER_LOGLEVEL
+            value: ${SERVER_LOGLEVEL}
+          - name: SERVER_MORGANFORMAT
+            value: ${SERVER_MORGANFORMAT}
+          - name: UPLOADS_PATH
+            value: ${UPLOADS_PATH}
+          - name: UPLOADS_FIELD_NAME
+            value: ${UPLOADS_FIELD_NAME}
+          - name: UPLOADS_FILE_SIZE
+            value: ${UPLOADS_FILE_SIZE}
+          - name: UPLOADS_FILE_COUNT
+            value: ${UPLOADS_FILE_COUNT}
+          - name: UPLOADS_FILE_TYPE
+            value: ${UPLOADS_FILE_TYPE}
+          - name: CMSG_SENDER
+            value: ${CMSG_SENDER}
           - name: CMSG_CLIENT_ID
             valueFrom:
               secretKeyRef:
                 key: username
-                name: email-microsrv-client
+                name: "${SECRET_NAME}"
           - name: CMSG_CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 key: password
-                name: email-microsrv-client
+                name: "${SECRET_NAME}"
           envFrom:
           - configMapRef:
-              name: email-microsrv-config
+              name: "${CONFIG_MAP_NAME}"
         dnsPolicy: ClusterFirst
         restartPolicy: Always
         schedulerName: default-scheduler
@@ -111,18 +133,6 @@ objects:
     test: false
 
 parameters:
-- name: REPO_NAME
-  description: Application repository name
-  required: true
-  value: nr-email-microservice
-- name: SOURCE_REPO_URL
-  description: Git Repository URL
-  required: true
-  value: https://github.com/bcgov/nr-email-microservice.git
-- name: SOURCE_REPO_REF
-  description: Git Pull Request Reference (i.e. 'pull/CHANGE_ID/head')
-  required: true
-  value: master
 - name: APP_NAME
   description: Application name
   required: true
@@ -132,6 +142,62 @@ parameters:
 - name: NAMESPACE
   description: OpenShift namespace containing our email microservice image to deploy (ex. idcqvl-dev)
   required: true
+- name: SECRET_NAME
+  description: name of the secret to pass in as environment variables
+  required: true
+  value: email-microsrv-cmsg-client
+- name: CONFIG_MAP_NAME
+  description: name of the secret to pass in as environment variables
+  required: true
+  value: email-microsrv-cmsg-urls
+- name: HOST_URL
+  description: The domain/base url where we will expose the api
+  required: true
+  value: "http://email-microsrv:8080"
+- name: PORT
+  description: port for node to listen on.  Best to leave as the default 8080
+  required: true
+  value: "8080"
+- name: SERVICE_VERSION
+  description: useful if you are forking and versioning your own code
+  required: true
+  value: "1"
+- name: SERVICE_HOMEPAGE
+  description: useful if you are forking and versioning your own code
+  required: true
+  value: "https://github.com/bcgov/nr-email-microservice.git"
+- name: SERVER_LOGLEVEL
+  description: set the npm log level (verbose, debug, info, warn, error)
+  required: true
+  value: "info"
+- name: SERVER_MORGANFORMAT
+  description: set the logging format for Morgan
+  required: true
+  value: "dev"
+- name: UPLOADS_PATH
+  description: path to store the uploaded files
+  required: true
+  value: "./uploads"
+- name: UPLOADS_FIELD_NAME
+  description: upload file configuration, which form/request fields to use for the file uploads
+  required: true
+  value: "files"
+- name: UPLOADS_FILE_SIZE
+  description: upload file configuration, limit the accepted size of files (in bytes)
+  required: true
+  value: "5242880"
+- name: UPLOADS_FILE_COUNT
+  description: upload file configuration, limit the number of files to accept in one upload
+  required: true
+  value: "3"
+- name: UPLOADS_FILE_TYPE
+  description: upload file configuration, limit the accepted file type
+  required: true
+  value: "pdf"
+- name: CMSG_SENDER
+  description: default email address to use as the sender/from.
+  required: true
+  value: "no-reply@nr-email-microservice.org"
 - name: CPU_REQUEST
   description: Requested CPU per pod (in millicores ex. 500m)
   required: true

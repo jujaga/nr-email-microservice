@@ -6,7 +6,7 @@
     "homepage": "https://github.com/bcgov/nr-email-microservice.git"
   },
   "server": {
-    "logLevel": "debug",
+    "logLevel": "info",
     "morganFormat": "dev",
     "port": "8080",
     "uploads" : {

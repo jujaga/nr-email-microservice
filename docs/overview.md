@@ -1,7 +1,7 @@
 ---
-title: NR Messaging Service Showcase
-description: Send email, track delivery status, automated retry
----  
+title: NR Email Microservice
+description: Send email, track delivery status
+---
 
 ## Summary
 
@@ -15,11 +15,11 @@ The Common Messaging Service (CMSG) is used to email users. The CMSG service is 
 
 ### Getting Started
 - [Getting Started](https://github.com/bcgov/nr-get-token/wiki/Getting-Started)
-- [README](../readme.md)  
-- [Developer Guide](https://github.com/bcgov/nr-messaging-service-showcase/docs/developer-guide.md) - to learn how to build your own application that connects to CMSG-Messaging-API. 
+- [README](../readme.md)
+- [Developer Guide](developer-guide.md) - to learn how to build your own application that connects to CMSG-Messaging-API.
 - [DevHub](https://developer.gov.bc.ca)
 - [Request a "MSSC Capabilities Demo"](mailto:NR.CommonServiceShowcase@gov.bc.ca)
-- [nr-showcase repositories](https://github.com/bcgov/?=nr-showcase)  
+- [nr-showcase repositories](https://github.com/bcgov/?=nr-showcase)
 
 ## Additional Resources
 

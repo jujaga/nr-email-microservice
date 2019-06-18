@@ -56,16 +56,12 @@ objects:
     successfulBuildsHistoryLimit: 5
 
 parameters:
-- name: REPO_NAME
-  description: Application repository name
-  required: true
-  value: nr-email-microservice
 - name: SOURCE_REPO_URL
   description: Git Repository URL
   required: true
   value: https://github.com/bcgov/nr-email-microservice.git
 - name: SOURCE_REPO_REF
-  description: Git Pull Request Reference (i.e. 'pull/CHANGE_ID/head')
+  description: Check out a specific Git reference. A valid ref can be a SHA1 tag (i.e. 'release-1.0.0') or a branch name (i.e. 'master'), or pull request ref. (i.e. 'pull/CHANGE_ID/head')
   required: true
   value: master
 - name: APP_NAME
