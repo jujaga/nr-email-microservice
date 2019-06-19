@@ -18,8 +18,10 @@ routes.get('/', function (req, res) {
     data: { ... config.get('service') },
     links: relatedLinks.createLinks(req, [
       {r:'config', m:'GET', p:'/config'},
-      {r:'health', m:'GET', p:'/health'},
+      {r:'documentation', m:'GET', p:'/docs'},
       {r:'email', m:'POST', p:'/email'},
+      {r:'health', m:'GET', p:'/health'},
+      {r:'specs', m:'GET', p:'/api-spec.yaml'},
       {r:'uploads', m:'POST', p:'/uploads'}
     ])
   });
@@ -45,4 +47,12 @@ routes.post('/uploads', login, authenticate, authorize(CREATE_MSG), upload, wrap
   await handleFiles(req, res);
 }));
 
+routes.get('/docs', function(req, res) {
+  const docs = require('./docs');
+  res.send(docs.getDocHTML('v1'));
+});
+
+routes.get('/api-spec.yaml', (req, res) => {
+  res.sendFile(require('path').join(__dirname, './v1.api-spec.yaml'));
+});
 module.exports = routes;

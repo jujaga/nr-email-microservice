@@ -2,6 +2,9 @@
 
 The Email Microservice is a [node.js](https://nodejs.org/) server that demonstrates how one could call the Common Messaging Service (CMSG) and integrate it into an application.
 
+## API Documentation
+The API is documented in Open API 3.  The documentation can be viewed/downloaded from a running instance at /api/v1/docs path.  View the [api spec yaml](./msgService/v1.api-spec.yaml).
+
 ### Prerequisites
 Since Common Messaging Service (CMSG) is authenticated and authorized with [WebADE](http://webade.org), we need to have our application (MSSC) authorized to call CMSG.  To do this, we can use [Get Token](https://github.com/bcgov/nr-get-token) to create a service client.  This will give us a service client id and password for a particular Common Services environment.  We will need the WebADE OAuth Token url and the CMSG url for that environment.
 

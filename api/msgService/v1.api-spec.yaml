@@ -1,0 +1,489 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Email Microservice API
+  description: >-
+    This API is a wrapper over Common Messaging Services API (CMSG) v1 published at https://apistore.nrs.gov.bc.ca/store/apis/info?name=cmsg-messaging-api&version=v1
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+  contact:
+    name: NR Common Service Showcase
+    email: NR.CommonServiceShowcase@gov.bc.ca
+servers:
+  - url: /api/v1
+    description: This Server
+paths:
+  /:
+    get:
+      summary: Returns Email Microservice details and related links
+      operationId: topLevel
+      tags:
+        - topLevel
+      responses:
+        '200':
+          description: Responds if the correspondent API is available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TopLevel'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /config:
+    get:
+      summary: Returns configuration data, particularly for configuration of file uploads endpoint
+      operationId: config
+      tags:
+        - config
+      responses:
+        '200':
+          description: Returns configuration data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /email:
+    post:
+      summary: Send email message, with optional attachments
+      security:
+        - OAuth2: [CMSG.CREATEMESSAGE]
+      operationId: email
+      tags:
+        - email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailForm'
+      responses:
+        '200':
+          description: Returns email message id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+        '4xx':
+          description: Email error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/EmailError'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /email/{messageId}/status:
+    get:
+      summary: Returns statuses for provided message id
+      operationId: status
+      tags:
+        - email
+        - status
+      parameters:
+        - name: messageId
+          in: path
+          description: Message Id from /email response
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns status list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Status'
+        '4xx':
+          description: Email Statuses error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/StatusError'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /health:
+    get:
+      summary: Returns health check data.  Checks CMSG client configuration and scopes, checks CMSG API availability
+      operationId: health
+      tags:
+        - health
+      responses:
+        '200':
+          description: Returns health check data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '4xx':
+          description: Services error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/responses/HealthError'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /uploads:
+    post:
+      summary: Allows uploads of files, to be used as attachments for email
+      security:
+        - OAuth2: [CMSG.CREATEMESSAGE]
+      operationId: uploads
+      tags:
+        - uploads
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: binary
+              required:
+                - files
+      responses:
+        '200':
+          description: Returns file list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Uploads'
+        '4xx':
+          description: Upload error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '5xx':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            CMSG.GETTOPLEVEL: access to CMSG api
+            CMSG.CREATEMESSAGE: access to send email messages
+  schemas:
+    RelatedLink:
+      properties:
+        rel:
+          type: string
+          description: Relationship of link to this response
+          example: self
+        method:
+          type: string
+          description: Http Method for call (GET, POST, PUT, DELETE)
+          example: GET
+        href:
+          type: string
+          description: Url to the related item
+          example: http://localhost:8080/api/v1/
+    TopLevelData:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of this service
+          example: email-microsrv
+        description:
+          type: string
+          description: Description of this service
+          example: This API is a wrapper over Common Messaging Services API (CMSG) v1 published at https://apistore.nrs.gov.bc.ca/store/apis/info?name=cmsg-messaging-api&version=v1
+        version:
+          type: string
+          description: Version of this service
+          example: 1.0.0
+        homepage:
+          type: string
+          description: Homepage for this particular release/version
+          example: https://github.com/bcgov/nr-email-microservice.git
+    TopLevel:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/TopLevelData'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    ConfigDataAttachments:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Name of the field containing the files in /uploads
+          example: files
+        fileSize:
+          type: integer
+          description: Max. number of bytes accepted per file in /uploads
+          example: 5242880
+        fileCount:
+          type: integer
+          description: Number of files accepted in /uploads
+          example: 3
+        fileType:
+          type: string
+          description: File type accepted in /uploads
+          example: pdf
+    ConfigData:
+      type: object
+      properties:
+        defaultSender:
+          type: string
+          description: Email address that can be used as a default sender
+          example: NR.CommonServiceShowcase@gov.bc.ca
+        attachments:
+          $ref: '#/components/schemas/ConfigDataAttachments'
+    Config:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/ConfigData'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    EmailForm:
+      type: object
+      required:
+        - mediaType
+        - sender
+        - subject
+        - recipients
+        - message
+      properties:
+        mediaType:
+          type: string
+          description: Media Type for message field, text/plain or text/html
+          example: text/plain
+        sender:
+          type: string
+          description: Email address to use for sender/from
+          example: NR.CommonServiceShowcase@gov.bc.ca
+        subject:
+          type: string
+          description: Text to use as the Subject line
+          example: Attention - this is the subject
+        recipients:
+          type: string
+          description: Comma separated list of email addresses
+          example: "address_one@fakedomain.xyz,address_two@fakedomain.abc"
+        message:
+          type: string
+          description: Message/body of the email, can be plain text or html
+          example: This is an informational email.
+    Email:
+      type: object
+      properties:
+        data:
+          properties:
+            messageId:
+              type: string
+              description: Message Id from CMSG
+              example: 71111fc38e22541107489fa9ecb2329f
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    HealthDataCmsg:
+      type: object
+      properties:
+        credentialsGood:
+          type: boolean
+          description: True if configured CMSG credentials are valid
+          example: true
+        credentialsAuthenticated:
+          type: boolean
+          description: True if configured CMSG credentials are authenticated by OAuth server
+          example: true
+        hasTopLevel:
+          type: boolean
+          description: True if configured CMSG service client has CMSG.GETTOPLEVEL scope
+          example: true
+        hasCreateMessage:
+          type: boolean
+          description: True if configured CMSG service client has CMSG.CREATEMESSAGE scope
+          example: true
+        cmsgApiHealthy:
+          type: boolean
+          description: True if configured CMSG API is up and running
+          example: true
+    HealthData:
+      type: object
+      properties:
+        cmsg:
+          $ref: '#/components/schemas/HealthDataCmsg'
+    Health:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/HealthData'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    StatusData:
+      type: object
+      properties:
+        messageId:
+          type: string
+          description: Message Id from CMSG
+          example: 71111fc38e22541107489fa9ecb2329f
+        recipient:
+          type: string
+          description: email address of individual recipient
+          example: address_one@fakedomain.xyz
+        type:
+          type: string
+          description: Status type from CMSG
+          example: DELIVERY_TO_GATEWAY_SUCCESS
+        content:
+          type: string
+          description: Human readable status type message from CMSG
+          example: Outbound message delivery to remote gateway succeeded.
+        date:
+          type: long
+          description: long value of date message receieved by CMSG
+          example: 1560970077504
+    Status:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusData'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    UploadsDataFile:
+      type: object
+      properties:
+        originalname:
+          type: string
+          description: Name of the file uploaded.
+          example: Kubernetes_OpenShift.pdf
+        encoding:
+          type: string
+          description: Encoding type used for file storage
+          example: 7bit
+        mimetype:
+          type: string
+          description: Mime Type of uploaded file
+          example: application/pdf
+        size:
+          type: integer
+          description: Number of bytes of uploaded file
+          example: 2276240
+    UploadsData:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/UploadsDataFile'
+    Uploads:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/UploadsData'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/RelatedLink'
+          description: A list of Related Links
+    Error:
+      properties:
+        type:
+          type: string
+          description: designates an http status error type
+          example: https://httpstatuses.com/404
+        title:
+          type: string
+          description: Descriptive title of error
+          example: Page Not Found
+        status:
+          type: integer
+          description: Http Status
+          example: 404
+        detail:
+          type: string
+          description: Provide more context to error, perhaps failed url
+          example: "/api/v1/badpage"
+  responses:
+    Forbidden:
+      description: Lack required role to perform action
+    NotFound:
+      description: Not found
+    UnauthorizedError:
+      description: Access token is missing or invalid
+    HealthError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Error assessing Health
+      properties:
+        tokenUrl:
+          type: string
+          description: May be present if error related to OAuth
+          example: https://i1api.nrs.gov.bc.ca/oauth2/v1/oauth/token
+        cmsgUrl:
+          type: string
+          description: May be present if error related to configured CMSG API
+          example: https://i1api.nrs.gov.bc.ca/cmsg-messaging-api/v1/
+    EmailError:
+      allOf:
+        - $ref: '#/components/schemas/Error'
+      description: Error sending email
+      properties:
+        cmsgUrl:
+          type: string
+          description: May be present if error related to configured CMSG API
+          example: https://i1api.nrs.gov.bc.ca/cmsg-messaging-api/v1/
+        cmsgErrors:
+          type: array
+          description: May be present if error related to configured CMSG API, return errors from CMSG
+          items:
+            type: string
+    StatusError:
+      allOf:
+        - $ref: '#/components/responses/EmailError'
+      description: Error getting email message status list

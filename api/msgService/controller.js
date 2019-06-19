@@ -9,7 +9,6 @@ const getConfig = async (req, res) => {
   delete uploads.path;
   res.status(200).json({
     data: {
-      service: {... config.get('service')},
       attachments: uploads,
       defaultSender: config.get('cmsg.sender')
     },
