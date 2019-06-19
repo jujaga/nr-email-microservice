@@ -2,17 +2,17 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: "${APP_NAME}${INSTANCE_ID}-api-bc"
+  template: "${APP_LABEL}-email-microsrv-bc"
 metadata:
-  name: "${APP_NAME}${INSTANCE_ID}-api-bc"
+  name: "${APP_LABEL}-email-microsrv-bc"
 objects:
 
 - apiVersion: image.openshift.io/v1
   kind: ImageStream
   metadata:
     labels:
-      app: "${APP_NAME}${INSTANCE_ID}"
-    name: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
   spec:
     lookupPolicy:
       local: false
@@ -21,8 +21,8 @@ objects:
   kind: BuildConfig
   metadata:
     labels:
-      app: "${APP_NAME}${INSTANCE_ID}"
-    name: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
   spec:
     completionDeadlineSeconds: 600
     failedBuildsHistoryLimit: 5
@@ -30,7 +30,7 @@ objects:
     output:
       to:
         kind: ImageStreamTag
-        name: "${APP_NAME}${INSTANCE_ID}-api:latest"
+        name: "${IMAGE_NAME}:latest"
     postCommit: {}
     resources:
       requests:
@@ -64,12 +64,13 @@ parameters:
   description: Check out a specific Git reference. A valid ref can be a SHA1 tag (i.e. 'release-1.0.0') or a branch name (i.e. 'master'), or pull request ref. (i.e. 'pull/CHANGE_ID/head')
   required: true
   value: master
-- name: APP_NAME
-  description: Application name
+- name: APP_LABEL
+  description: Application name, will be used for metadata and label=APP_LABEL
   required: true
   value: email-microsrv
-- name: INSTANCE_ID
-  description: Differentiate instances of microservice (pull request instances vs master), start with a dash to separate from app_name (i.e. '-pr-5' OR '-master')
+- name: IMAGE_NAME
+  description: Name to use for the image
+  value: email-microsrv-api
 - name: CPU_REQUEST
   description: Requested CPU per pod (in millicores ex. 500m)
   required: true

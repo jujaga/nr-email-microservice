@@ -82,8 +82,8 @@ The template accepts 8 parameters:
 
 * SOURCE\_REPO\_URL - complete url to the repo (including .git).  Default is this repository.
 * SOURCE\_REPO\_REF - Git reference to pull - could be a tag, a pull request (ex. pull/3/head), branch.  Default is master.
-* APP\_NAME - a name for the application deployment, combines with INSTANCE\_ID.  Default is email-microsrv.
-* INSTANCE\_ID - a suffix for application name.  This is useful with pull requests when one would stand up many instances in the same namespace.  Default is ''
+* APP\_LABEL - value to use for labels app=APP\_LABEL.  Default is email-microsrv.
+* IMAGE\_NAME - value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api
 
 The following will allow you to customize the [resource load](https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html) during image build time:
 * CPU\_REQUEST - Requested CPU per pod (in millicores ex. 500m).  Default 500m
@@ -92,7 +92,7 @@ The following will allow you to customize the [resource load](https://docs.opens
 * MEMORY\_LIMIT - Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi).  Default 2Gi
 
 ### Deployment Template - api.dc.yaml
-The deployment config template will result in an Service and Deployment/Pods.  By default, we employ a 2 Pod rolling strategy for maximum uptime.  *APP\_NAME* and  *INSTANCE\_ID* parameters must match values used running the Build Template.  And *NAMESPACE* must be provided.
+The deployment config template will result in an Service and Deployment/Pods.  By default, we employ a 2 Pod rolling strategy for maximum uptime.  *APP\_LABEL* and  *IMAGE\_NAME* parameters must match values used running the Build Template.  And *NAMESPACE* must be provided.
 
 A Route is *not* included in the deployment template, as not all use cases will require this api to be exposed publicly.  See the examples on how to expose the service if you wish to use the api directly.
 
@@ -100,8 +100,8 @@ A Route is *not* included in the deployment template, as not all use cases will 
 
 The template accepts 7 parameters:
 
-* APP\_NAME - a name for the application deployment, combines with INSTANCE\_ID.  Default is email-microsrv.
-* INSTANCE\_ID - a suffix for application name.  This is useful with pull requests when one would stand up many instances in the same namespace.  Default is ''
+* APP\_LABEL - value to use for labels app=APP\_LABEL.  Default is email-microsrv.
+* IMAGE\_NAME - value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api
 * NAMESPACE - The namespace where the build image is located.  Required, with *no* default.
 
 The following allow for overriding the default secret and configmap (that are auto-loaded into environment variables):
@@ -109,7 +109,7 @@ The following allow for overriding the default secret and configmap (that are au
 * CONFIG_MAP_\_NAME - name of your configmap.  Default email-microsrv-cmsg-urls
 
 The following are for setting environment variables.
-* HOST\_URL - The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv:8080
+* HOST\_URL - The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv-api:8080
 * PORT - port for node to listen on.  Best to leave as the default 8080 - see note above.
 * SERVICE\_VERSION - useful if you are forking and versioning your own code.  Default 1.0.0
 * SERVICE\_HOMEPAGE - useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git
@@ -222,9 +222,9 @@ The following will illustrate how to call the templates from the command line an
 cd openshift
 export proj=<your namespace ex. idcqvl-dev>
 
-export app_name=emailms
-export pr=5
-export instance_id=-pr-$pr
+export pr_num=5
+export app_label=emailms-pr-$pr_num
+export image_name=emailms-pr-$pr_num-api
 
 export oauth_token_url=<token url for the webade oauth instance>
 export cmsg_id=<your CMSG Service Client Id>
@@ -237,7 +237,7 @@ Create a new secret just for this pull request.
 
 ``` sh
 
-oc create secret -n $proj generic $app_name$instance_id-cmsg-client --from-literal=username=$cmsg_id --from-literal=password=$cmsg_secret --type=kubernetes.io/basic-auth
+oc create secret -n $proj generic $image_name-cmsg-client --from-literal=username=$cmsg_id --from-literal=password=$cmsg_secret --type=kubernetes.io/basic-auth
 
 ```
 
@@ -245,16 +245,15 @@ Create a new configmap just for this pull request.
 
 ``` sh
 
-oc create configmap -n $proj $app_name$instance_id-cmsg-urls --from-literal=OAUTH_TOKEN_URL=$oauth_token_url --from-literal=CMSG_TOP_LEVEL_URL=$cmsg_url
+oc create configmap -n $proj $image_name-cmsg-urls --from-literal=OAUTH_TOKEN_URL=$oauth_token_url --from-literal=CMSG_TOP_LEVEL_URL=$cmsg_url
 
 ```
 
-Process the Build template.  In this example, we have a pull request (5), and we want to build a unique and complete instance/environment.  Note that we are adding an INSTANCE_ID parameter, all the object names will be unique, the app label will also be unique.  The change for APP\_NAME is included to show how to fully change the name of the app and components if required.
+Process the Build template.  In this example, we have a pull request (5), and we want to build a unique and complete instance/environment.  Note that we are adding a APP\_LABEL and IMAGE\_NAME parameters, all the object names will be unique, the app label will also be unique.
 
 ``` sh
 
-oc -n $proj process -f api.bc.yaml -p SOURCE_REPO_REF=pull/$pr/head -p APP_NAME=$app_name -p INSTANCE_ID=$instance_id -o yaml | oc -n $proj create -f -
-oc -n $proj process -f api.bc.yaml -p SOURCE_REPO_REF=feature/initial -p APP_NAME=$app_name -p INSTANCE_ID=$instance_id -o yaml | oc -n $proj create -f -
+oc -n $proj process -f api.bc.yaml -p SOURCE_REPO_REF=pull/$pr/head -p APP_LABEL=$app_label -p IMAGE_NAME=$image_name -o yaml | oc -n $proj create -f -
 
 imagestream.image.openshift.io/emailms-pr-5-api created
 buildconfig.build.openshift.io/emailms-pr-5-api created
@@ -284,7 +283,7 @@ Once the runtime image has been built, we can process our deployment configurati
 
 ``` sh
 
-oc -n $proj process -f api.dc.yaml -p NAMESPACE=$proj -p APP_NAME=$app_name -p INSTANCE_ID=$instance_id -p SECRET_NAME=$app_name$instance_id-cmsg-client -p CONFIG_MAP_NAME=$app_name$instance_id-cmsg-urls -p HOST_URL=http://$app_name$instance_id-$proj.pathfinder.gov.bc.ca -o yaml | oc -n $proj create -f -
+oc -n $proj process -f api.dc.yaml -p NAMESPACE=$proj -p APP_LABEL=$app_label -p IMAGE_NAME=$image_name -p SECRET_NAME=$image_name-cmsg-client -p CONFIG_MAP_NAME=$image_name-cmsg-urls -p HOST_URL=http://$image_name-$proj.pathfinder.gov.bc.ca -o yaml | oc -n $proj create -f -
 
 service/emailms-pr-5-api created
 deploymentconfig.apps.openshift.io/emailms-pr-5-api created
@@ -307,7 +306,7 @@ Optional: create a route to access the api.
 
 ```sh
 
-oc -n $proj expose svc/emailms-pr-5-api --hostname=$app_name$instance_id-$proj.pathfinder.gov.bc.ca --path=/api/v1
+oc -n $proj expose svc/emailms-pr-5-api --hostname=$image_name-$proj.pathfinder.gov.bc.ca --path=/api/v1
 
 route.route.openshift.io/emailms-pr-5-api exposed
 
@@ -317,7 +316,7 @@ Optional: delete what you have created.
 
 ``` sh
 
-oc -n $proj  delete all,template,secret,configmap,pvc,serviceaccount,rolebinding --selector app=emailms-pr-5
+oc -n $proj  delete all,template,secret,configmap,pvc,serviceaccount,rolebinding --selector app=$app_label
 
 ```
 

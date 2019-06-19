@@ -2,17 +2,17 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: "${APP_NAME}${INSTANCE_ID}-api-dc"
+  template: "${APP_LABEL}-email-microsrv-dc"
 metadata:
-  name: "${APP_NAME}${INSTANCE_ID}-api-dc"
+  name: "${APP_LABEL}-email-microsrv-dc"
 objects:
 
 - apiVersion: v1
   kind: Service
   metadata:
     labels:
-      app: "${APP_NAME}${INSTANCE_ID}"
-    name: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
   spec:
     ports:
     - name: 8080-tcp
@@ -20,8 +20,8 @@ objects:
       protocol: TCP
       targetPort: 8080
     selector:
-      app: "${APP_NAME}${INSTANCE_ID}"
-      deploymentconfig: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+      deploymentconfig: "${IMAGE_NAME}"
     sessionAffinity: None
     type: ClusterIP
 
@@ -29,14 +29,14 @@ objects:
   kind: DeploymentConfig
   metadata:
     labels:
-      app: "${APP_NAME}${INSTANCE_ID}"
-    name: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
   spec:
     replicas: 2
     revisionHistoryLimit: 10
     selector:
-      app: "${APP_NAME}${INSTANCE_ID}"
-      deploymentconfig: "${APP_NAME}${INSTANCE_ID}-api"
+      app: "${APP_LABEL}"
+      deploymentconfig: "${IMAGE_NAME}"
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -50,11 +50,11 @@ objects:
     template:
       metadata:
         labels:
-          app: "${APP_NAME}${INSTANCE_ID}"
-          deploymentconfig: "${APP_NAME}${INSTANCE_ID}-api"
+          app: "${APP_LABEL}"
+          deploymentconfig: "${IMAGE_NAME}"
       spec:
         containers:
-        - image: "docker-registry.default.svc:5000/${NAMESPACE}/${APP_NAME}${INSTANCE_ID}-api:latest"
+        - image: "docker-registry.default.svc:5000/${NAMESPACE}/${IMAGE_NAME}:latest"
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -66,7 +66,7 @@ objects:
             periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 5
-          name: "${APP_NAME}${INSTANCE_ID}-api"
+          name: "${IMAGE_NAME}"
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -133,12 +133,13 @@ objects:
     test: false
 
 parameters:
-- name: APP_NAME
-  description: Application name
+- name: APP_LABEL
+  description: Application name, will be used for metadata and label=APP_LABEL
   required: true
   value: email-microsrv
-- name: INSTANCE_ID
-  description: Differentiate instances of microservice (pull request instances vs master), start with a dash to separate from app_name (i.e. '-pr-5' OR '-master')
+- name: IMAGE_NAME
+  description: Name to use for the image
+  value: email-microsrv-api
 - name: NAMESPACE
   description: OpenShift namespace containing our email microservice image to deploy (ex. idcqvl-dev)
   required: true
