@@ -11,6 +11,7 @@ const Problem = require('api-problem');
 
 const cmsgSvc = {
   healthCheck: async (token) => {
+    let error = undefined;
     const response = await axios.get(ROOT_URL, {
       headers: {
         'Authorization':`Bearer ${token}`,
@@ -18,14 +19,17 @@ const cmsgSvc = {
       }
     }
     ).catch(e => {
-      throw new Problem(e.response.status, 'CMSG Health Check error', {detail: e.message, cmsgUrl: ROOT_URL});
+      error = `Error verifying Common Messaging API alive at ${ROOT_URL}: ${e.response.status} - ${e.response.statusText}`;
+      log.error('', error);
+      throw new Problem(e.response.status, 'CMSG Health Check error', {detail: error, cmsgUrl: ROOT_URL});
     });
 
     log.verbose(utils.prettyStringify(response.data));
 
     if (response.status !== 200) {
-      log.error('', 'Error verifying Common Messaging API alive at %s: %d - %s', ROOT_URL, response.status, response.statusText);
-      throw new Problem(response.status, 'CMSG Health Check error', {detail: 'Error verifying Common Messaging API alive', cmsgUrl: ROOT_URL});
+      error = `Error verifying Common Messaging API alive at ${ROOT_URL}: ${response.status} - ${response.statusText}`;
+      log.error('', error);
+      throw new Problem(response.status, 'CMSG Health Check error', {detail: error, cmsgUrl: ROOT_URL});
     }
 
     return response.data['@type'] === 'http://nrscmsg.nrs.gov.bc.ca/v1/endpoints';

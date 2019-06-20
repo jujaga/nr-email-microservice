@@ -131,12 +131,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Health'
-        '4xx':
-          description: Services error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/responses/HealthError'
         '5xx':
           description: Unexpected error
           content:
@@ -345,6 +339,10 @@ components:
           type: boolean
           description: True if configured CMSG API is up and running
           example: true
+        error:
+          type: string
+          description: Optional.  If an error was encountered on health check, this will be populated indicating why. Helps to explain why a health check property is false.
+          example: 'Error verifying Common Messaging API alive at https://badapiurl/: 404 - Not Found'
     HealthData:
       type: object
       properties:
@@ -456,19 +454,6 @@ components:
       description: Not found
     UnauthorizedError:
       description: Access token is missing or invalid
-    HealthError:
-      allOf:
-        - $ref: '#/components/schemas/Error'
-      description: Error assessing Health
-      properties:
-        tokenUrl:
-          type: string
-          description: May be present if error related to OAuth
-          example: https://i1api.nrs.gov.bc.ca/oauth2/v1/oauth/token
-        cmsgUrl:
-          type: string
-          description: May be present if error related to configured CMSG API
-          example: https://i1api.nrs.gov.bc.ca/cmsg-messaging-api/v1/
     EmailError:
       allOf:
         - $ref: '#/components/schemas/Error'

@@ -1,5 +1,6 @@
 const config = require('config');
 const fileUtils = require('../components/fileUtils');
+const Problem = require('api-problem');
 
 const {relatedLinks} = require('./relatedLinks');
 const { cmsgSvc } = require('../msgService/cmsgSvc');
@@ -28,7 +29,15 @@ const getHealth = async (req, res) => {
 
   req.status.cmsgApiHealthy = false;
   if (req.status.hasTopLevel) {
-    req.status.cmsgApiHealthy = await cmsgSvc.healthCheck(req.token);
+    try {
+      req.status.cmsgApiHealthy = await cmsgSvc.healthCheck(req.token);
+    } catch (e) {
+      if (e instanceof Problem) {
+        req.status.error = e.detail;
+      } else {
+        req.status.error = e.message;
+      }
+    }
   }
 
   res.status(200).json({

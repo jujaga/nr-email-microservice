@@ -3,9 +3,7 @@ const wrap = require('../middleware/wrap');
 const {relatedLinks} = require('./relatedLinks');
 const {upload} = require('../middleware/upload');
 
-const {login} = require('../middleware/login');
-const {authenticate} = require('../middleware/authenticate');
-const {authorize} = require('../middleware/authorize');
+const {secure} = require('../middleware/secure');
 
 const CREATE_MSG = config.get('cmsg.scopes.createMessage');
 
@@ -31,19 +29,19 @@ routes.get('/config', wrap(async function (req, res) {
   await getConfig(req, res);
 }));
 
-routes.get('/health', login, wrap(async function (req, res) {
+routes.get('/health', secure({quiet: true}), wrap(async function (req, res) {
   await getHealth(req, res);
 }));
 
-routes.post('/email', login, authenticate, authorize(CREATE_MSG), wrap(async function (req, res, next) {
+routes.post('/email', secure({scope: CREATE_MSG}), wrap(async function (req, res, next) {
   await sendEmail(req, res, next);
 }));
 
-routes.get('/email/:messageId/status', login, authenticate, authorize(CREATE_MSG), wrap(async function (req, res) {
+routes.get('/email/:messageId/status', secure(), wrap(async function (req, res) {
   await getEmailStatus(req, res);
 }));
 
-routes.post('/uploads', login, authenticate, authorize(CREATE_MSG), upload, wrap(async function (req, res) {
+routes.post('/uploads', secure({scope: CREATE_MSG}), upload, wrap(async function (req, res) {
   await handleFiles(req, res);
 }));
 
