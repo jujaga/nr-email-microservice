@@ -1,13 +1,11 @@
 .DS_Store
 node_modules
 dist
+build
+uploads
 .nyc_output
 coverage
 
-
-backend/static
-backend/uploads
-frontend/build
 
 # local env files
 .env.local

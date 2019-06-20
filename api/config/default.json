@@ -1,0 +1,38 @@
+{
+  "service" : {
+    "name": "email-microsrv",
+    "description" : "This API is a wrapper over Common Messaging Services API (CMSG) v1 published at https://apistore.nrs.gov.bc.ca/store/apis/info?name=cmsg-messaging-api&version=v1",
+    "version": "1.0.0",
+    "homepage": "https://github.com/bcgov/nr-email-microservice.git"
+  },
+  "server": {
+    "logLevel": "info",
+    "morganFormat": "dev",
+    "port": "8080",
+    "uploads" : {
+      "path": "./uploads",
+      "fieldName": "files",
+      "fileSize": "5242880",
+      "fileCount": "3",
+      "fileType": "pdf"
+    },
+    "hostUrl": "http://localhost:8080"
+  },
+  "cmsg": {
+    "urls": {
+      "token": "set in custom environment variables...",
+      "root": "set in custom environment variables..."
+    },
+    "client": {
+      "id": "set in custom environment variables...",
+      "secret": "set in custom environment variables..."
+    },
+    "scopes": {
+      "all": "CMSG.*",
+      "topLevel": "CMSG.GETTOPLEVEL",
+      "createMessage": "CMSG.CREATEMESSAGE"
+    },
+    "sender": "NR.CommonServiceShowcase@gov.bc.ca"
+  }
+}
+
