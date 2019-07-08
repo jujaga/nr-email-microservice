@@ -6,6 +6,7 @@ const morgan = require('morgan');
 
 const msgService = require('./msgService/routes');
 const utils = require('./components/utils');
+const {userAuthenticationOidc} = require('./userAuthentication/oidc/init');
 
 const Problem = require('api-problem');
 
@@ -28,6 +29,8 @@ log.verbose(utils.prettyStringify(config));
 // expose our service at this end point.
 app.use('/api/v1', msgService);
 
+// if user authentication is enabled/configured, add strategies and handling.
+userAuthenticationOidc(app);
 
 // Handle 500
 // eslint-disable-next-line no-unused-vars

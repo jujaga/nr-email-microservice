@@ -1,0 +1,242 @@
+---
+apiVersion: v1
+kind: Template
+labels:
+  template: "${APP_LABEL}-email-microsrv-dc"
+metadata:
+  name: "${APP_LABEL}-email-microsrv-dc"
+objects:
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: "${APP_LABEL}"
+      deploymentconfig: "${IMAGE_NAME}"
+    sessionAffinity: None
+    type: ClusterIP
+
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: "${APP_LABEL}"
+    name: "${IMAGE_NAME}"
+  spec:
+    replicas: 2
+    revisionHistoryLimit: 10
+    selector:
+      app: "${APP_LABEL}"
+      deploymentconfig: "${IMAGE_NAME}"
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: "${APP_LABEL}"
+          deploymentconfig: "${IMAGE_NAME}"
+      spec:
+        containers:
+        - image: "docker-registry.default.svc:5000/${NAMESPACE}/${IMAGE_NAME}:latest"
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: "/api/v1/"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 60
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: "${IMAGE_NAME}"
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: "/api/v1/"
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: "${CPU_REQUEST}"
+              memory: "${MEMORY_REQUEST}"
+            limits:
+              cpu: "${CPU_LIMIT}"
+              memory: "${MEMORY_LIMIT}"
+          env:
+          - name: HOST_URL
+            value: ${HOST_URL}
+          - name: PORT
+            value: ${PORT}
+          - name: SERVICE_VERSION
+            value: ${SERVICE_VERSION}
+          - name: SERVICE_HOMEPAGE
+            value: ${SERVICE_HOMEPAGE}
+          - name: SERVER_LOGLEVEL
+            value: ${SERVER_LOGLEVEL}
+          - name: SERVER_MORGANFORMAT
+            value: ${SERVER_MORGANFORMAT}
+          - name: UPLOADS_PATH
+            value: ${UPLOADS_PATH}
+          - name: UPLOADS_FIELD_NAME
+            value: ${UPLOADS_FIELD_NAME}
+          - name: UPLOADS_FILE_SIZE
+            value: ${UPLOADS_FILE_SIZE}
+          - name: UPLOADS_FILE_COUNT
+            value: ${UPLOADS_FILE_COUNT}
+          - name: UPLOADS_FILE_TYPE
+            value: ${UPLOADS_FILE_TYPE}
+          - name: CMSG_SENDER
+            value: ${CMSG_SENDER}
+          - name: CMSG_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "${SECRET_NAME}"
+          - name: CMSG_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "${SECRET_NAME}"
+          - name: OIDC_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                key: username
+                name: "${OIDC_SECRET_NAME}"
+          - name: OIDC_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                key: password
+                name: "${OIDC_SECRET_NAME}"
+          - name: JWT_PUBLICKEY
+            valueFrom:
+              secretKeyRef:
+                key: publickey
+                name: "${OIDC_SECRET_NAME}"
+          envFrom:
+          - configMapRef:
+              name: "${CONFIG_MAP_NAME}"
+          - configMapRef:
+              name: "${OIDC_CONFIG_MAP_NAME}"
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+
+parameters:
+- name: APP_LABEL
+  description: Application name, will be used for metadata and label=APP_LABEL
+  required: true
+  value: email-microsrv
+- name: IMAGE_NAME
+  description: Name to use for the image
+  value: email-microsrv-api
+- name: NAMESPACE
+  description: OpenShift namespace containing our email microservice image to deploy (ex. idcqvl-dev)
+  required: true
+- name: SECRET_NAME
+  description: name of the secret to pass in as environment variables
+  required: true
+  value: email-microsrv-cmsg-client
+- name: CONFIG_MAP_NAME
+  description: name of the config map to pass in as environment variables
+  required: true
+  value: email-microsrv-cmsg-urls
+- name: OIDC_SECRET_NAME
+  description: name of the User Auth / OIDC secret to pass in as environment variables
+  required: true
+  value: email-microsrv-oidc-client
+- name: OIDC_CONFIG_MAP_NAME
+  description: name of the User Auth / OIDC config map to pass in as environment variables
+  required: true
+  value: email-microsrv-oidc
+- name: HOST_URL
+  description: The domain/base url where we will expose the api
+  required: true
+  value: "http://email-microsrv:8080"
+- name: PORT
+  description: port for node to listen on.  Best to leave as the default 8080
+  required: true
+  value: "8080"
+- name: SERVICE_VERSION
+  description: useful if you are forking and versioning your own code
+  required: true
+  value: "1.1.0"
+- name: SERVICE_HOMEPAGE
+  description: useful if you are forking and versioning your own code
+  required: true
+  value: "https://github.com/bcgov/nr-email-microservice.git"
+- name: SERVER_LOGLEVEL
+  description: set the npm log level (verbose, debug, info, warn, error)
+  required: true
+  value: "info"
+- name: SERVER_MORGANFORMAT
+  description: set the logging format for Morgan
+  required: true
+  value: "dev"
+- name: UPLOADS_PATH
+  description: path to store the uploaded files
+  required: true
+  value: "./uploads"
+- name: UPLOADS_FIELD_NAME
+  description: upload file configuration, which form/request fields to use for the file uploads
+  required: true
+  value: "files"
+- name: UPLOADS_FILE_SIZE
+  description: upload file configuration, limit the accepted size of files (in bytes)
+  required: true
+  value: "5242880"
+- name: UPLOADS_FILE_COUNT
+  description: upload file configuration, limit the number of files to accept in one upload
+  required: true
+  value: "3"
+- name: UPLOADS_FILE_TYPE
+  description: upload file configuration, limit the accepted file type
+  required: true
+  value: "pdf"
+- name: CMSG_SENDER
+  description: default email address to use as the sender/from.
+  required: true
+  value: "no-reply@nr-email-microservice.org"
+- name: CPU_REQUEST
+  description: Requested CPU per pod (in millicores ex. 500m)
+  required: true
+  value: 500m
+- name: MEMORY_REQUEST
+  description: Requested Memory per pod (in gigabytes Gi or megabytes Mi ex. 500Mi)
+  required: true
+  value: 1Gi
+- name: CPU_LIMIT
+  description: Limit Peak CPU per pod (in millicores ex. 1000m)
+  required: true
+  value: 1000m
+- name: MEMORY_LIMIT
+  description: Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi)
+  required: true
+  value: 2Gi

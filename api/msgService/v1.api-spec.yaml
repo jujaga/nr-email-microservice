@@ -57,6 +57,7 @@ paths:
       summary: Send email message, with optional attachments
       security:
         - OAuth2: [CMSG.CREATEMESSAGE]
+        - openId: []
       operationId: email
       tags:
         - email
@@ -88,6 +89,9 @@ paths:
   /email/{messageId}/status:
     get:
       summary: Returns statuses for provided message id
+      security:
+        - OAuth2: [CMSG.CREATEMESSAGE]
+        - openId: []
       operationId: status
       tags:
         - email
@@ -142,6 +146,7 @@ paths:
       summary: Allows uploads of files, to be used as attachments for email
       security:
         - OAuth2: [CMSG.CREATEMESSAGE]
+        - openId: []
       operationId: uploads
       tags:
         - uploads
@@ -191,6 +196,8 @@ components:
           scopes:
             CMSG.GETTOPLEVEL: access to CMSG api
             CMSG.CREATEMESSAGE: access to send email messages
+    openId:
+      type: openIdConnect
   schemas:
     RelatedLink:
       properties:
@@ -273,6 +280,33 @@ components:
           items:
             $ref: '#/components/schemas/RelatedLink'
           description: A list of Related Links
+    EmailAttachment:
+      type: object
+      required:
+        - filename
+        - mimetype
+        - originalname
+      properties:
+        filename:
+          type: string
+          description: The name of the uploaded file (as returned from Uploads API call)
+          example: file-01201201230
+        originalname:
+          type: string
+          description: Name of the file uploaded.
+          example: Kubernetes_OpenShift.pdf
+        encoding:
+          type: string
+          description: Encoding type used for file storage
+          example: 7bit
+        mimetype:
+          type: string
+          description: Mime Type of uploaded file
+          example: application/pdf
+        size:
+          type: integer
+          description: Number of bytes of uploaded file
+          example: 2276240
     EmailForm:
       type: object
       required:
@@ -302,6 +336,10 @@ components:
           type: string
           description: Message/body of the email, can be plain text or html
           example: This is an informational email.
+        filenames:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailAttachment'
     Email:
       type: object
       properties:

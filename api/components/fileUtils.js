@@ -4,6 +4,7 @@ var fs = require('fs');
 const log = require('npmlog');
 const util = require('util');
 const unlink = util.promisify(fs.unlink);
+const utils = require('./utils');
 
 const fileUtils = {
   encode_base64: (filename) => {
@@ -23,7 +24,7 @@ const fileUtils = {
   convertFile: (file) => {
     return new Promise((resolve, reject) => {
       try {
-        fileUtils.encode_base64(file.path).then(encoded => {
+        fileUtils.encode_base64(fileUtils.filePath(file)).then(encoded => {
           resolve({
             name: file.originalname,
             fileType: config.get('server.uploads.fileType'),
@@ -42,11 +43,17 @@ const fileUtils = {
 
   deleteFiles: async (files) => {
     try {
-      const unlinkPromises = files.map(file => unlink(file.path));
+      const unlinkPromises = files.map(file => unlink(fileUtils.filePath(file)));
       return Promise.all(unlinkPromises);
     } catch(err) {
       log.error(err);
     }
+  },
+
+  filePath: (file) => {
+    const path = utils.removeTrailing(config.get('server.uploads.path'), '/');
+    const name = utils.removeLeading(file.filename, '/');
+    return `${path}/${name}`;
   }
 
 };
