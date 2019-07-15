@@ -32,7 +32,7 @@ objects:
       app: "${APP_LABEL}"
     name: "${IMAGE_NAME}"
   spec:
-    replicas: "${REPLICA_COUNT}"
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       app: "${APP_LABEL}"
@@ -40,13 +40,7 @@ objects:
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
-      rollingParams:
-        intervalSeconds: 1
-        maxSurge: 25%
-        maxUnavailable: 25%
-        timeoutSeconds: 600
-        updatePeriodSeconds: 1
-      type: Rolling
+      type: Recreate
     template:
       metadata:
         labels:
@@ -215,7 +209,3 @@ parameters:
   description: Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi)
   required: true
   value: 2Gi
-- name: REPLICA_COUNT
-  description: Number of pods/replica controllers to create
-  required: true
-  value: 1
