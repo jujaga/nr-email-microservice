@@ -32,7 +32,7 @@ objects:
       app: "${APP_LABEL}"
     name: "${IMAGE_NAME}"
   spec:
-    replicas: "${REPLICA_COUNT}"
+    replicas: 1
     revisionHistoryLimit: 10
     selector:
       app: "${APP_LABEL}"
@@ -240,7 +240,3 @@ parameters:
   description: Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi)
   required: true
   value: 2Gi
-- name: REPLICA_COUNT
-  description: Number of pods/replica controllers to create
-  required: true
-  value: "1"
