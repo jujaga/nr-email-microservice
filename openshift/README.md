@@ -66,6 +66,7 @@ As mentioned above, user authentication can be added, to enable it, we need to c
 
 ```sh
 
+export oidc_issuer_url=<url for the OIDC realm>
 export oidc_discovery_url=<url for the OIDC realm>
 export oidc_id=<your OIDC Service Client Id>
 export oidc_secret=<your OIDC Service Client Secret>
@@ -74,7 +75,7 @@ export oidc_secret=<your OIDC Service Client Secret>
 
 ```sh
 
-oc create configmap -n $proj email-microsrv-oidc --from-literal=OIDC_DISCOVERY=$oidc_discovery_url --from-literal=USER_AUTHENTICATION_ENABLED=true --from-literal=OIDC_ENABLED=true
+oc create configmap -n $proj email-microsrv-oidc --from-literal=OIDC_ISSUER=$oidc_issuer_url --from-literal=OIDC_DISCOVERY=$oidc_discovery_url --from-literal=USER_AUTHENTICATION_ENABLED=true --from-literal=OIDC_ENABLED=true
 
 ```
 
