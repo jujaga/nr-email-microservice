@@ -32,7 +32,7 @@ objects:
       app: "${APP_LABEL}"
     name: "${IMAGE_NAME}"
   spec:
-    replicas: 1
+    replicas: "${REPLICA_COUNT}"
     revisionHistoryLimit: 10
     selector:
       app: "${APP_LABEL}"
@@ -40,7 +40,13 @@ objects:
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
-      type: Recreate
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
     template:
       metadata:
         labels:
@@ -237,4 +243,4 @@ parameters:
 - name: REPLICA_COUNT
   description: Number of pods/replica controllers to create
   required: true
-  value: 1
+  value: "1"
