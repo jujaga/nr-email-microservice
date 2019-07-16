@@ -6,6 +6,8 @@ The email microservice is deployed to OpenShift.  Here you will find documentati
 ## Prerequisite
 Since the email microservice is a wrapper around Common Messaging Service (CMSG)[../docs/overview.md], we need authorization to call it.  You will need to have your a Service Client ID and secret, and the OAuth Url for that client/environment (basically who, where, how we authenticate).  The service client id and password will be created through [Get Token](https://github.com/bcgov/nr-get-token).  You will need to get the Common Messaging Service (CMSG) api url and the OAuth url for whichever Common Services environment you are targetting.
 
+If you are are going to secure your exposed endpoints with User Authentication, then you will need additional information, and you will need to perform some additional steps.  Keep in mind that this is completely optional.
+
 
 ## Conventions
 The following documentation assumes that you have access and admin rights to an OpenShift environment; and that you have the OpenShift command line tools installed and on your path.  Please refer to the [Get Started with the CLI](https://docs.openshift.com/container-platform/3.11/cli_reference/get_started_cli.html) documentation.  If you are logged into your OpenShift Console, see <your console-url>/console/commandline for more information.
@@ -58,6 +60,32 @@ oc create configmap -n $proj email-microsrv-cmsg-urls --from-literal=OAUTH_TOKEN
 #### Other configurable environment variables
 Other environmental variables will be set in the deployment config; this affords us the most flexibility for configuring instances on the fly.  See [api/README.md](../api/README.md) for all the configuration values and how they are loaded and used within the api code.
 
+#### User Authentication Secrets and ConfigMap
+As mentioned above, user authentication can be added, to enable it, we need to configure it.  First, you need to configure your providers (ie. a KeyCloak OpenID Connect Realm).
+
+
+```sh
+
+export oidc_issuer_url=<url for the OIDC realm>
+export oidc_discovery_url=<url for the OIDC realm>
+export oidc_id=<your OIDC Service Client Id>
+export oidc_secret=<your OIDC Service Client Secret>
+
+```
+
+```sh
+
+oc create configmap -n $proj email-microsrv-oidc --from-literal=OIDC_ISSUER=$oidc_issuer_url --from-literal=OIDC_DISCOVERY=$oidc_discovery_url --from-literal=USER_AUTHENTICATION_ENABLED=true --from-literal=OIDC_ENABLED=true
+
+```
+
+_Note: Publickey must be a PEM-encoded value encapsulated in double quotes in the argument. Newlines should not be re-encoded when using this command. If authentication fails, it's very likely a newline whitespace issue._
+
+```sh
+
+oc create secret -n $proj generic email-microsrv-oidc-client --from-literal=username=$oidc_id --from-literal=password=$oidc_secret --from-literal=publickey="<key>" --type=kubernetes.io/basic-auth
+
+```
 
 ## Overview
 
@@ -99,36 +127,50 @@ A Route is *not* included in the deployment template, as not all use cases will 
 *Important note*: the deployment is configured to use port 8080 for the Service, this value is passed to the api code via an environment variable (as PORT).  If you wish to use ports other than 8080, then you will have to update the deployment configuration and ensure the environment variable passed to the pods matches.
 
 The template accepts 7 parameters:
-
-* APP\_LABEL - value to use for labels app=APP\_LABEL.  Default is email-microsrv.
-* IMAGE\_NAME - value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api
-* NAMESPACE - The namespace where the build image is located.  Required, with *no* default.
+| Name | Description |
+| --- | --- |
+| APP_LABEL | value to use for labels app=APP\_LABEL.  Default is email-microsrv. |
+| IMAGE_NAME | value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api |
+| NAMESPACE | The namespace where the build image is located.  Required, with *no* default. |
 
 The following allow for overriding the default secret and configmap (that are auto-loaded into environment variables):
-* SECRET\_NAME - name of your secret.  Default email-microsrv-cmsg-client
-* CONFIG_MAP_\_NAME - name of your configmap.  Default email-microsrv-cmsg-urls
+| Name | Description |
+| --- | --- |
+| SECRET_NAME | name of your secret.  Default email-microsrv-cmsg-client |
+| CONFIG_MAP_NAME | name of your configmap.  Default email-microsrv-cmsg-urls |
 
 The following are for setting environment variables.
-* HOST\_URL - The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv-api:8080
-* PORT - port for node to listen on.  Best to leave as the default 8080 - see note above.
-* SERVICE\_VERSION - useful if you are forking and versioning your own code.  Default 1.0.0
-* SERVICE\_HOMEPAGE - useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git
-* SERVER\_LOGLEVEL - set the npm log level (verbose, debug, info, warn, error). Default is info
-* SERVER\_MORGANFORMAT - set the logging format for Morgan.  Default dev
-* UPLOADS\_PATH - path to store the uploaded files.  Default ./uploads
-* UPLOADS\_FIELD\_NAME - upload file configuration, which form/request fields to use for the file uploads.  Default is 'files'.
-* UPLOADS\_FILE\_SIZE - limit the accepted size of files (in bytes).  Default is 5242880.
-* UPLOADS\_FILE_COUNT - limit the number of files to accept in one upload.  Default is 3.
-* UPLOADS\_FILE\_TYPE - limit the accepted file types.  Default is 'pdf'.  This is a current limitation of CMSG.
-* CMSG\_SENDER - default email address to use as the sender/from. Default is: 'no-reply@nr-email-microservice.org'
+| Name | Description |
+| --- | --- |
+| HOST_URL | The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv-api:8080 |
+| PORT | port for node to listen on.  Best to leave as the default 8080 - see note above. |
+| SERVICE_VERSION | useful if you are forking and versioning your own code.  Default 1.0.0 |
+| SERVICE_HOMEPAGE | useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git |
+| SERVER_LOGLEVEL | set the npm log level (verbose, debug, info, warn, error). Default is info |
+| SERVER_MORGANFORMAT | set the logging format for Morgan.  Default dev |
+| UPLOADS_PATH | path to store the uploaded files.  Default ./uploads |
+| UPLOADS_FIELD\_NAME | upload file configuration, which form/request fields to use for the file uploads.  Default is 'files'. |
+| UPLOADS_FILE\_SIZE | limit the accepted size of files (in bytes).  Default is 5242880. |
+| UPLOADS_FILE_COUNT | limit the number of files to accept in one upload.  Default is 3. |
+| UPLOADS_FILE\_TYPE | limit the accepted file types.  Default is 'pdf'.  This is a current limitation of CMSG. |
+| CMSG_SENDER | default email address to use as the sender/from. Default is: 'no-reply@nr-email-microservice.org' |
 
 The following will allow you to customize the [resource load](https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html) during runtime of the pods:
+| Name | Description |
+| --- | --- |
+| CPU_REQUEST | Requested CPU per pod (in millicores ex. 500m).  Default 500m |
+| MEMORY_REQUEST | Requested Memory per pod (in gigabytes Gi or megabytes Mi ex. 500Mi).  Default 1Gi |
+| CPU_LIMIT | Limit Peak CPU per pod (in millicores ex. 1000m).  Default 1000m |
+| MEMORY_LIMIT | Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi).  Default 2Gi |
 
-* CPU\_REQUEST - Requested CPU per pod (in millicores ex. 500m).  Default 500m
-* MEMORY\_REQUEST - Requested Memory per pod (in gigabytes Gi or megabytes Mi ex. 500Mi).  Default 1Gi
-* CPU\_LIMIT - Limit Peak CPU per pod (in millicores ex. 1000m).  Default 1000m
-* MEMORY\_LIMIT - Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi).  Default 2Gi
+#### User Authentication Deployment - api.dc.user-auth.yaml
+If you are enabling and configuring user authentication, then the above applies, but you will need to use a different template ([api.dc.user-auth.yaml](api.dc.user-auth.yaml)) and set additional parameters.  We will set some parameters to include the extra config map and secret created earlier.
 
+The following are to configure the optional User Authentication module.
+| Name | Description |
+| --- | --- |
+| OIDC_SECRET_NAME | name of your OIDC secret.  Default email-microsrv-oidc-client |
+| OIDC_CONFIG_MAP_NAME | name of your OIDC configmap.  Default email-microsrv-oidc |
 
 #### Default example
 The following will illustrate how to call the templates from the command line.  A sort of, manual pipeline...  Assuming you have already initialized the environment with the secret and configmap (see above).  This will employ all the default values. We will also expose our own route and use that as an example for setting our HOST\_URL parameter.

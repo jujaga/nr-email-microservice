@@ -3,6 +3,16 @@
     "version": "SERVICE_VERSION",
     "homepage": "SERVICE_HOMEPAGE"
   },
+  "userAuthentication": {
+    "enabled": "USER_AUTHENTICATION_ENABLED"
+  },
+  "oidc": {
+    "enabled": "OIDC_ENABLED",
+    "discovery": "OIDC_DISCOVERY",
+    "clientID": "OIDC_CLIENT_ID",
+    "clientSecret": "OIDC_CLIENT_SECRET",
+    "publicKey": "JWT_PUBLICKEY"
+  },
   "server": {
     "logLevel": "SERVER_LOGLEVEL",
     "morganFormat": "SERVER_MORGANFORMAT",

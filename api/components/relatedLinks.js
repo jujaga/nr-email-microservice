@@ -1,25 +1,16 @@
 const config = require('config');
+const utils = require('./utils');
 
 const relatedLinks = {
 
-  removeLeading: (s, c) => {
-    if (!s || !c) return;
-    return s.startsWith(c) ? s.substring(c.length, s.length) : s;
-  },
-
-  removeTrailing: (s, c) => {
-    if (!s || !c) return;
-    return s.endsWith(c) ? s.substring(0, s.length - c.length) : s;
-  },
-
   createHref: (req, path) => {
-    const hostUrl = relatedLinks.removeTrailing(config.get('server.hostUrl'), '/');
-    const baseUrl = relatedLinks.removeTrailing(relatedLinks.removeLeading(req.baseUrl, '/'), '/');
+    const hostUrl = utils.removeTrailing(config.get('server.hostUrl'), '/');
+    const baseUrl = utils.removeTrailing(utils.removeLeading(req.baseUrl, '/'), '/');
     const p = path ? path : req.path;
-    const linkPath = relatedLinks.removeLeading(p, '/');
+    const linkPath = utils.removeLeading(p, '/');
 
     const href = [hostUrl, baseUrl, linkPath].join('/');
-    return relatedLinks.removeTrailing(href, '/');
+    return utils.removeTrailing(href, '/');
   },
 
   createLink: (req, rel, method, path) => {

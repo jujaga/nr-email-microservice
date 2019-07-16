@@ -2,7 +2,7 @@ const config = require('config');
 const fileUtils = require('../components/fileUtils');
 const Problem = require('api-problem');
 
-const {relatedLinks} = require('./relatedLinks');
+const {relatedLinks} = require('../components/relatedLinks');
 const { cmsgSvc } = require('../msgService/cmsgSvc');
 
 const getConfig = async (req, res) => {

@@ -1,8 +1,9 @@
 const config = require('config');
 const wrap = require('../middleware/wrap');
-const {relatedLinks} = require('./relatedLinks');
+const {relatedLinks} = require('../components/relatedLinks');
 const {upload} = require('../middleware/upload');
 
+const {userAuthenticate} = require('../userAuthentication/jwt/middleware');
 const {secure} = require('../middleware/secure');
 
 const CREATE_MSG = config.get('cmsg.scopes.createMessage');
@@ -33,15 +34,15 @@ routes.get('/health', secure({quiet: true}), wrap(async function (req, res) {
   await getHealth(req, res);
 }));
 
-routes.post('/email', secure({scope: CREATE_MSG}), wrap(async function (req, res, next) {
+routes.post('/email', userAuthenticate, secure({scope: CREATE_MSG}), wrap(async function (req, res, next) {
   await sendEmail(req, res, next);
 }));
 
-routes.get('/email/:messageId/status', secure(), wrap(async function (req, res) {
+routes.get('/email/:messageId/status', userAuthenticate, secure(), wrap(async function (req, res) {
   await getEmailStatus(req, res);
 }));
 
-routes.post('/uploads', secure({scope: CREATE_MSG}), upload, wrap(async function (req, res) {
+routes.post('/uploads', userAuthenticate, secure({scope: CREATE_MSG}), upload, wrap(async function (req, res) {
   await handleFiles(req, res);
 }));
 
@@ -53,4 +54,5 @@ routes.get('/docs', function(req, res) {
 routes.get('/api-spec.yaml', (req, res) => {
   res.sendFile(require('path').join(__dirname, './v1.api-spec.yaml'));
 });
+
 module.exports = routes;
