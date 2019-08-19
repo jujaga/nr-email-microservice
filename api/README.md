@@ -19,34 +19,35 @@ The current implementation does not check scopes or roles, it simply verifies th
 To configure the application for local development, we have a few options.  Since we are using the npm library: [config](https://www.npmjs.com/package/config), to configure our application.  We can either set environment variables to be picked up by [custom-environment-variables.json](/config/custom-environment-variables.json) or we can create a local configuration file (do not check into source control) such as local.json.  Please read the config library documentation to see how it overlays various environment files and uses environment variables to override those values (when provided).
 
 #### Environment Variables
-| Name | Default | Description |
-| --- | --- | --- |
-| OAUTH_TOKEN_URL | | The WebADE environment OAuth Token url (ex. https://i1api.nrs.gov.bc.ca/oauth2/v1/oauth/token) |
-| CMSG_TOP_LEVEL_URL | | The CMSG url (ex. https://i1api.nrs.gov.bc.ca/cmsg-messaging-api/v1/) |
-| CMSG_CLIENT_ID | | This is the service client id for microservice that has been authorized to call CMSG. |
-| CMSG_CLIENT_SECRET | | The service client password/secret |
-| HOST_URL | http://localhost:8080 | The domain/base url where we will expose the api. |
-| PORT | 8080 | port for node to listen on. |
-| SERVICE_VERSION | 1 | Current default 1 |
-| SERVICE_HOMEPAGE | https://github.com/bcgov/nr-email-microservice.git | Should point at the repository for the deployed code. |
-| SERVER_LOGLEVEL | info | set the npm log level (verbose, debug, info, warn, error). |
-| SERVER_MORGANFORMAT | dev | set the logging format for Morgan. |
-| UPLOADS_PATH | ./uploads | path to store the uploaded files. |
-| UPLOADS_FIELD_NAME | files | upload file configuration, which form/request fields to use for the file uploads. |
-| UPLOADS_FILE_SIZE | 5242880 | limit the accepted size of files (in bytes). |
-| UPLOADS_FILE_COUNT | 3 | limit the number of files to accept in one upload. |
-| UPLOADS_FILE_TYPE | pdf'| limit the accepted file types.  Default of 'pdf' is a current limitation of CMSG. |
-| CMSG_SENDER | 'NR.CommonServiceShowcase@gov.bc.ca' | default email address to use as the sender/from. |
+
+| Name | Default | Description |  
+| --- | --- | --- |  
+| OAUTH\_TOKEN\_URL | | The WebADE environment OAuth Token url (ex. https://i1api.nrs.gov.bc.ca/oauth2/v1/oauth/token) |  
+| CMSG\_TOP\_LEVEL\_URL | | The CMSG url (ex. https://i1api.nrs.gov.bc.ca/cmsg-messaging-api/v1/) |  
+| CMSG\_CLIENT\_ID | | This is the service client id for microservice that has been authorized to call CMSG. |  
+| CMSG\_CLIENT\_SECRET | | The service client password/secret |  
+| HOST\_URL | http://localhost:8080 | The domain/base url where we will expose the api. |  
+| PORT | 8080 | port for node to listen on. |  
+| SERVICE\_VERSION | 1 | Current default 1 |  
+| SERVICE\_HOMEPAGE | https://github.com/bcgov/nr-email-microservice.git | Should point at the repository for the deployed code. |  
+| SERVER\_LOGLEVEL | info | set the npm log level (verbose, debug, info, warn, error). |  
+| SERVER\_MORGANFORMAT | dev | set the logging format for Morgan. |  
+| UPLOADS\_PATH | ./uploads | path to store the uploaded files. |  
+| UPLOADS\_FIELD\_NAME | files | upload file configuration, which form/request fields to use for the file uploads. |  
+| UPLOADS\_FILE\_SIZE | 5242880 | limit the accepted size of files (in bytes). |  
+| UPLOADS\_FILE\_COUNT | 3 | limit the number of files to accept in one upload. |  
+| UPLOADS\_FILE\_TYPE | pdf'| limit the accepted file types.  Default of 'pdf' is a current limitation of CMSG. |  
+| CMSG\_SENDER | 'NR.CommonServiceShowcase@gov.bc.ca' | default email address to use as the sender/from. |  
 
 ##### (Optional) User Authentication Configuration
-| Name | Default | Description |
-| --- | --- | --- |
-| USER_AUTHENTICATION_ENABLED | false | Enable/Disable the user authentication setup and middleware |
-| OIDC_ENABLED | false | Indicate whether OIDC is to be used |
-| OIDC_DISCOVERY | | Url to the OIDC issuer realm discovery mechanism |
-| OIDC_CLIENT_ID | | OIDC Client ID |
-| OIDC_CLIENT_SECRET | | OIDC Client Password/Secret |
-| JWT_PUBLICKEY | | OIDC Realm public key |
+| Name | Default | Description |  
+| --- | --- | --- |  
+| USER\_AUTHENTICATION\_ENABLED | false | Enable/Disable the user authentication setup and middleware |  
+| OIDC\_ENABLED | false | Indicate whether OIDC is to be used |  
+| OIDC\_DISCOVERY | | Url to the OIDC issuer realm discovery mechanism |  
+| OIDC\_CLIENT\_ID | | OIDC Client ID |  
+| OIDC\_CLIENT\_SECRET | | OIDC Client Password/Secret |  
+| JWT\_PUBLICKEY | | OIDC Realm public key |  
 
 Notes: USER\_AUTHENTICATION\_ENABLED and OIDC\_ENABLED must be true, and all the other OIDC configuration must be completed to fully load the User Authentication mechanism.  For local development, the JWT\_PUBLIC\_KEY will require line breaks ("\\n") and the "-----BEGIN PUBLIC KEY-----" and "-----END PUBLIC KEY-----" delimiters.
 
