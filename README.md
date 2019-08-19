@@ -1,12 +1,10 @@
 # nr-email-microservice
 
-This Project is just starting. We are refactoring our NR Messaging Service Showcase application and creating a microservice from its backend so that other projects that would like to onboard to using the CMSG-Messaging-API can do so with as least effort as possible.   
+The NR Email Microservice project is a result of refactoring the NR Messaging Service Showcase application.  We have created a microservice from its backend so that other projects can use the CMSG-Messaging-API with the least amount of effort as possible.   
 
-This Microservice can be deployed as a container in your product to enable sending email, and checking the status
+This Microservice can be deployed as a container in your product to enable sending email, and checking the status.  Optionally, it can be protected with OpenID Connect and JWT.
 
 You need to contact NR.CommonServiceShowcase@gov.bc.ca to get an account for your application.
 
 ## Showcase Application
-The microservice is currently implemented directly as the backend of the NR Messaging Service Showcase application.
-
-COMING SOON: To see this microservice implemented by another application you can review https://github.com/bcgov/nr-messaging-service-showcase
+The microservice is currently implemented directly as the backend of the [NR Messaging Service Showcase application](https://github.com/bcgov/nr-messaging-service-showcase).
