@@ -30,11 +30,14 @@ const getHealth = async (req, res) => {
   req.status.cmsgApiHealthy = false;
   if (req.status.hasTopLevel) {
     try {
+      // eslint-disable-next-line require-atomic-updates
       req.status.cmsgApiHealthy = await cmsgSvc.healthCheck(req.token);
     } catch (e) {
       if (e instanceof Problem) {
+        // eslint-disable-next-line require-atomic-updates
         req.status.error = e.detail;
       } else {
+        // eslint-disable-next-line require-atomic-updates
         req.status.error = e.message;
       }
     }
