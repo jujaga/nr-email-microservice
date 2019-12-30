@@ -7,6 +7,20 @@ metadata:
   name: "${APP_LABEL}-email-microsrv-dc"
 objects:
 
+- kind: NetworkSecurityPolicy
+  apiVersion: secops.pathfinder.gov.bc.ca/v1alpha1
+  metadata:
+    name: "${APP_LABEL}-pods-to-egress-${NAMESPACE}"
+  spec:
+    description: |
+      Allow pods to open connections to the internet
+    source:
+      - - "app=${APP_LABEL}"
+        - "deploymentconfig=${IMAGE_NAME}"
+        - role=backend
+    destination:
+      - - ext:network=any
+
 - apiVersion: v1
   kind: Service
   metadata:
@@ -22,6 +36,7 @@ objects:
     selector:
       app: "${APP_LABEL}"
       deploymentconfig: "${IMAGE_NAME}"
+      role: backend
     sessionAffinity: None
     type: ClusterIP
 
@@ -37,6 +52,7 @@ objects:
     selector:
       app: "${APP_LABEL}"
       deploymentconfig: "${IMAGE_NAME}"
+      role: backend
     strategy:
       activeDeadlineSeconds: 21600
       resources: {}
@@ -52,6 +68,7 @@ objects:
         labels:
           app: "${APP_LABEL}"
           deploymentconfig: "${IMAGE_NAME}"
+          role: backend
       spec:
         containers:
         - image: "docker-registry.default.svc:5000/${NAMESPACE}/${IMAGE_NAME}:latest"
