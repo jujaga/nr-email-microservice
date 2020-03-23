@@ -119,56 +119,57 @@ A Route is *not* included in the deployment template, as not all use cases will 
 
 *Important note*: the deployment is configured to use port 8080 for the Service, this value is passed to the api code via an environment variable (as PORT).  If you wish to use ports other than 8080, then you will have to update the deployment configuration and ensure the environment variable passed to the pods matches.
 
-The template accepts 7 parameters:  
+The template accepts 7 parameters:
 
-| Name | Description |    
-| --- | --- |  
-| APP\_LABEL | value to use for labels app=APP\_LABEL.  Default is email-microsrv. |  
-| IMAGE\_NAME | value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api |  
-| NAMESPACE | The namespace where the build image is located.  Required, with *no* default. |  
+| Name | Description |
+| --- | --- |
+| APP\_LABEL | value to use for labels app=APP\_LABEL.  Default is email-microsrv. |
+| IMAGE\_NAME | value to use for all the created objects: service, image, bc, dc.  Default is email-microsrv-api |
+| IMAGE\_TAG | tag an image for deployment, useful to differentiate pull requests from master.  Default is master |
+| NAMESPACE | The namespace where the build image is located.  Required, with *no* default. |
 
-The following allow for overriding the default secret and configmap (that are auto-loaded into environment variables):  
+The following allow for overriding the default secret and configmap (that are auto-loaded into environment variables):
 
-| Name | Description |    
-| --- | --- |  
-| SECRET\_NAME | name of your secret.  Default email-microsrv-cmsg-client |  
-| CONFIG\_MAP\_NAME | name of your configmap.  Default email-microsrv-cmsg-urls |  
+| Name | Description |
+| --- | --- |
+| SECRET\_NAME | name of your secret.  Default email-microsrv-cmsg-client |
+| CONFIG\_MAP\_NAME | name of your configmap.  Default email-microsrv-cmsg-urls |
 
-The following are for setting environment variables.  
+The following are for setting environment variables.
 
-| Name | Description |  
-| --- | --- |  
-| HOST\_URL | The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv-api:8080 |  
-| PORT | port for node to listen on.  Best to leave as the default 8080 - see note above. |  
-| SERVICE\_VERSION | useful if you are forking and versioning your own code.  Default 1.0.0 |  
-| SERVICE\_HOMEPAGE | useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git |  
-| SERVER\_LOGLEVEL | set the npm log level (verbose, debug, info, warn, error). Default is info |  
-| SERVER\_MORGANFORMAT | set the logging format for Morgan.  Default dev |  
-| UPLOADS\_PATH | path to store the uploaded files.  Default ./uploads |  
-| UPLOADS\_FIELD\_NAME | upload file configuration, which form/request fields to use for the file uploads.  Default is 'files'. |  
-| UPLOADS\_FILE\_SIZE | limit the accepted size of files (in bytes).  Default is 5242880. |  
-| UPLOADS\_FILE\_COUNT | limit the number of files to accept in one upload.  Default is 3. |  
-| UPLOADS\_FILE\_TYPE | limit the accepted file types.  Default is 'pdf'.  This is a current limitation of CMSG. |  
-| CMSG\_SENDER | default email address to use as the sender/from. Default is: 'no-reply@nr-email-microservice.org' |  
+| Name | Description |
+| --- | --- |
+| HOST\_URL | The domain/base url where we will expose the api.  This could be our own route, or could be a reverse proxy url.  Will be passed as an environment variable (as HOST\_URL) into the api code.  This should always be set during the deployment. Default is http://email-microsrv-api:8080 |
+| PORT | port for node to listen on.  Best to leave as the default 8080 - see note above. |
+| SERVICE\_VERSION | useful if you are forking and versioning your own code.  Default 1.0.0 |
+| SERVICE\_HOMEPAGE | useful if you are forking, should point at the repository for the deployed code.  Default https://github.com/bcgov/nr-email-microservice.git |
+| SERVER\_LOGLEVEL | set the npm log level (verbose, debug, info, warn, error). Default is info |
+| SERVER\_MORGANFORMAT | set the logging format for Morgan.  Default dev |
+| UPLOADS\_PATH | path to store the uploaded files.  Default ./uploads |
+| UPLOADS\_FIELD\_NAME | upload file configuration, which form/request fields to use for the file uploads.  Default is 'files'. |
+| UPLOADS\_FILE\_SIZE | limit the accepted size of files (in bytes).  Default is 5242880. |
+| UPLOADS\_FILE\_COUNT | limit the number of files to accept in one upload.  Default is 3. |
+| UPLOADS\_FILE\_TYPE | limit the accepted file types.  Default is 'pdf'.  This is a current limitation of CMSG. |
+| CMSG\_SENDER | default email address to use as the sender/from. Default is: 'no-reply@nr-email-microservice.org' |
 
-The following will allow you to customize the [resource load](https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html) during runtime of the pods:  
+The following will allow you to customize the [resource load](https://docs.openshift.com/container-platform/3.11/dev_guide/compute_resources.html) during runtime of the pods:
 
-| Name | Description |  
-| --- | --- |  
-| CPU\_REQUEST | Requested CPU per pod (in millicores ex. 500m).  Default 500m |  
-| MEMORY\_REQUEST | Requested Memory per pod (in gigabytes Gi or megabytes Mi ex. 500Mi).  Default 1Gi |  
-| CPU\_LIMIT | Limit Peak CPU per pod (in millicores ex. 1000m).  Default 1000m |  
-| MEMORY\_LIMIT | Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi).  Default 2Gi |  
+| Name | Description |
+| --- | --- |
+| CPU\_REQUEST | Requested CPU per pod (in millicores ex. 500m).  Default 500m |
+| MEMORY\_REQUEST | Requested Memory per pod (in gigabytes Gi or megabytes Mi ex. 500Mi).  Default 1Gi |
+| CPU\_LIMIT | Limit Peak CPU per pod (in millicores ex. 1000m).  Default 1000m |
+| MEMORY\_LIMIT | Limit Peak Memory per pod (in gigabytes Gi or megabytes Mi ex. 2Gi).  Default 2Gi |
 
 #### User Authentication Deployment - api.dc.user-auth.yaml
 If you are enabling and configuring user authentication, then the above applies, but you will need to use a different template ([api.dc.user-auth.yaml](api.dc.user-auth.yaml)) and set additional parameters.  We will set some parameters to include the extra config map and secret created earlier.
 
-The following are to configure the optional User Authentication module.  
+The following are to configure the optional User Authentication module.
 
-| Name | Description |  
-| --- | --- |  
-| OIDC\_SECRET\_NAME | name of your OIDC secret.  Default email-microsrv-oidc-client |  
-| OIDC\_CONFIG\_MAP\_NAME | name of your OIDC configmap.  Default email-microsrv-oidc |  
+| Name | Description |
+| --- | --- |
+| OIDC\_SECRET\_NAME | name of your OIDC secret.  Default email-microsrv-oidc-client |
+| OIDC\_CONFIG\_MAP\_NAME | name of your OIDC configmap.  Default email-microsrv-oidc |
 
 #### Default example
 The following will illustrate how to call the templates from the command line.  A sort of, manual pipeline...  Assuming you have already initialized the environment with the secret and configmap (see above).  This will employ all the default values. We will also expose our own route and use that as an example for setting our HOST\_URL parameter.
