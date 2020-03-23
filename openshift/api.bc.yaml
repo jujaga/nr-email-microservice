@@ -50,7 +50,7 @@ objects:
       sourceStrategy:
         from:
           kind: ImageStreamTag
-          name: nodejs:12
+          name: nodejs:10
           namespace: openshift
         incremental: true
     successfulBuildsHistoryLimit: 5
