@@ -71,7 +71,7 @@ objects:
           role: backend
       spec:
         containers:
-        - image: "docker-registry.default.svc:5000/${NAMESPACE}/${IMAGE_NAME}:latest"
+        - image: "docker-registry.default.svc:5000/${NAMESPACE}/${IMAGE_NAME}:${IMAGE_TAG}"
           imagePullPolicy: Always
           livenessProbe:
             failureThreshold: 3
@@ -83,7 +83,7 @@ objects:
             periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 5
-          name: "${IMAGE_NAME}"
+          name: "${IMAGE_NAME}-${IMAGE_TAG}"
           ports:
           - containerPort: 8080
             protocol: TCP
@@ -174,6 +174,9 @@ parameters:
 - name: IMAGE_NAME
   description: Name to use for the image
   value: email-microsrv-api
+- name: IMAGE_TAG
+  description: Name to use for the image tag
+  value: master
 - name: NAMESPACE
   description: OpenShift namespace containing our email microservice image to deploy (ex. idcqvl-dev)
   required: true
